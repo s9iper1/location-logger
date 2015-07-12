@@ -18,11 +18,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        LocationDatabase database = new LocationDatabase(getApplicationContext());
-//        ArrayList<HashMap> all_coordinates = database.getCoordinatesForID("10");
-//        for (HashMap map : all_coordinates) {
-//            System.out.println(map.get("longitude") + ", " + map.get("latitude"));
-//        }
+        LocationDatabase database = new LocationDatabase(getApplicationContext());
+        ArrayList<HashMap> all_coordinates = database.getCoordinatesForID("10");
+        for (HashMap map : all_coordinates) {
+            System.out.println(map.get("longitude") + ", " + map.get("latitude"));
+        }
         Intent service = new Intent(this, LocationService.class);
         startService(service);
     }

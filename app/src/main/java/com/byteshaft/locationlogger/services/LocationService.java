@@ -17,6 +17,7 @@ import android.util.Log;
 import android.util.TimeUtils;
 import android.widget.Toast;
 
+import com.byteshaft.locationlogger.R;
 import com.byteshaft.locationlogger.database.LocationDatabase;
 import com.byteshaft.locationlogger.utils.LocationHelpers;
 import com.google.android.gms.common.ConnectionResult;
@@ -60,9 +61,13 @@ public class LocationService extends Service implements LocationListener,
     }
 
     private void stopLocationUpdate() {
+        mLocationChangedCounter = 0;
+        mLocationRecursionCounter = 0;
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         mGoogleApiClient.disconnect();
-        setLocationAlarm((int) TimeUnit.MINUTES.toMillis(1));
+        int requestInterval = Integer.valueOf(getString(R.string.location_interval));
+        int intervalInMillis = (int) TimeUnit.MINUTES.toMillis(requestInterval);
+        setLocationAlarm(intervalInMillis);
     }
 
     @Override
@@ -106,8 +111,6 @@ public class LocationService extends Service implements LocationListener,
         mLocationChangedCounter++;
         if (mLocationChangedCounter == 5) {
             mLocation = location;
-            mLocationChangedCounter = 0;
-            mLocationRecursionCounter = 0;
         }
     }
 
