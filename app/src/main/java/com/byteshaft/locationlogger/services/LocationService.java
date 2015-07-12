@@ -179,7 +179,9 @@ public class LocationService extends Service implements LocationListener,
 
     @Override
     public void onNewEntryCreated() {
-        Intent intent = new Intent(getApplicationContext(), LocationUploadService.class);
-        startService(intent);
+        if (!LocationUploadService.isRunning()) {
+            Intent intent = new Intent(getApplicationContext(), LocationUploadService.class);
+            startService(intent);
+        }
     }
 }
