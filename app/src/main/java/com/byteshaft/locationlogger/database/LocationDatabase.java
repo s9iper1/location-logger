@@ -13,6 +13,8 @@ import java.util.HashMap;
 
 public class LocationDatabase extends SQLiteOpenHelper {
 
+    private ArrayList<OnDatabaseChangedListener> mListeners = new ArrayList<>();
+
     public LocationDatabase(Context context) {
         super(context, DatabaseConstants.DATABASE_NAME, null, DatabaseConstants.DATABASE_VERSION);
     }
@@ -37,6 +39,7 @@ public class LocationDatabase extends SQLiteOpenHelper {
         values.put(DatabaseConstants.USER_ID_COLUMN, userId);
         db.insert(DatabaseConstants.TABLE_NAME, null, values);
         db.close();
+        dispatchEventOnNewEntryCreated();
     }
 
     public ArrayList<HashMap> getCoordinatesForID(String ID) {
@@ -67,5 +70,19 @@ public class LocationDatabase extends SQLiteOpenHelper {
         }
         cursor.close();
         return list;
+    }
+
+    public void setOnDatabaseChangedListener(OnDatabaseChangedListener listener) {
+        mListeners.add(listener);
+    }
+
+    public interface OnDatabaseChangedListener {
+        public void onNewEntryCreated();
+    }
+
+    private void dispatchEventOnNewEntryCreated() {
+        for (OnDatabaseChangedListener listener : mListeners) {
+            listener.onNewEntryCreated();
+        }
     }
 }
