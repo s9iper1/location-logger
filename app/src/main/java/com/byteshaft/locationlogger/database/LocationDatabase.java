@@ -66,6 +66,7 @@ public class LocationDatabase extends SQLiteOpenHelper {
             hashMap.put("user_id", userID);
             list.add(hashMap);
         }
+        db.close();
         cursor.close();
         return list;
     }
@@ -80,6 +81,7 @@ public class LocationDatabase extends SQLiteOpenHelper {
                 + ID;
         Cursor cursor = db.rawQuery(query, null);
         cursor.moveToFirst();
+        db.close();
         cursor.close();
     }
 
