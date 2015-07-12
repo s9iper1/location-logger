@@ -31,6 +31,7 @@ public class LocationService extends Service implements LocationListener,
     private int mLocationRecursionCounter;
     private int mLocationChangedCounter;
     private IntentFilter alarmIntent = new IntentFilter("com.byteshaft.LOCATION_ALARM");
+    private final String LOG_TAG = "LocationLogger";
 
     private BroadcastReceiver mLocationRequestAlarmReceiver = new BroadcastReceiver() {
         @Override
@@ -117,27 +118,21 @@ public class LocationService extends Service implements LocationListener,
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (mLocation == null && mLocationRecursionCounter > 120) {
+                if (mLocation == null && mLocationRecursionCounter > 24) {
                     mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                     if (mLocation != null) {
                         String latLast = String.valueOf(mLocation.getLatitude());
                         String lonLast = String.valueOf(mLocation.getLongitude());
-                        String text = String.format(
-                                "Cannot acquire currect location. " +
-                                        "Last known: Longitude: %s, Latitude %s", latLast, lonLast);
-                        Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
+                        Log.w(LOG_TAG, "Failed to get location current location, saving last known location");
                         stopLocationUpdate();
                     } else {
-                        Toast.makeText(
-                                getApplicationContext(),
-                                "Current location cannot be acquired",
-                                Toast.LENGTH_SHORT).show();
+                        Log.e(LOG_TAG, "Failed to get location");
                         stopLocationUpdate();
                     }
                 } else if (mLocation == null) {
                     acquireLocation();
                     mLocationRecursionCounter++;
-                    Log.i("TrackBuddy", "Tracker Thread Running... " + mLocationRecursionCounter);
+                    Log.i(LOG_TAG, "Tracker Thread Running: " + mLocationRecursionCounter);
                 } else {
                     String lat = String.valueOf(mLocation.getLatitude());
                     String lon = String.valueOf(mLocation.getLongitude());
@@ -149,6 +144,6 @@ public class LocationService extends Service implements LocationListener,
                     stopLocationUpdate();
                 }
             }
-        }, 1000);
+        }, 5000);
     }
 }
