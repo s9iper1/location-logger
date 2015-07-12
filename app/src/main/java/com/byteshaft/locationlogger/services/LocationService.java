@@ -56,8 +56,10 @@ public class LocationService extends Service implements LocationListener,
     private void stopLocationUpdate() {
         mLocationChangedCounter = 0;
         mLocationRecursionCounter = 0;
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-        mGoogleApiClient.disconnect();
+        if (mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            mGoogleApiClient.disconnect();
+        }
 //        int requestInterval = Integer.valueOf(getString(R.string.location_interval));
 //        int intervalInMillis = (int) TimeUnit.MINUTES.toMillis(requestInterval);
 //        setLocationAlarm(intervalInMillis);
