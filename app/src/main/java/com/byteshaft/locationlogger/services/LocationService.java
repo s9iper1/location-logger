@@ -134,6 +134,7 @@ public class LocationService extends Service implements LocationListener,
                     mLocationRecursionCounter++;
                     Log.i(LOG_TAG, "Tracker Thread Running: " + mLocationRecursionCounter);
                 } else {
+                    Log.i(LOG_TAG, "Location found, saving to database");
                     String lat = String.valueOf(mLocation.getLatitude());
                     String lon = String.valueOf(mLocation.getLongitude());
                     LocationDatabase database = new LocationDatabase(getApplicationContext());
