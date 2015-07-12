@@ -42,14 +42,9 @@ public class LocationDatabase extends SQLiteOpenHelper {
         dispatchEventOnNewEntryCreated();
     }
 
-    public ArrayList<HashMap> getCoordinatesForID(String ID) {
+    public ArrayList<HashMap> getAllRecords() {
         SQLiteDatabase db = getReadableDatabase();
-        String query = "SELECT * FROM "
-                + DatabaseConstants.TABLE_NAME
-                + " WHERE "
-                + DatabaseConstants.USER_ID_COLUMN
-                + "="
-                + ID;
+        String query = "SELECT * FROM " + DatabaseConstants.TABLE_NAME;
         Cursor cursor = db.rawQuery(query, null);
         ArrayList<HashMap> list = new ArrayList<>();
         while (cursor.moveToNext()) {
@@ -70,6 +65,15 @@ public class LocationDatabase extends SQLiteOpenHelper {
         }
         cursor.close();
         return list;
+    }
+
+    public boolean isDatabaseEmpty() {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + DatabaseConstants.TABLE_NAME, null);
+        boolean isEmpty;
+        isEmpty = !cursor.moveToNext();
+        cursor.close();
+        return isEmpty;
     }
 
     public void setOnDatabaseChangedListener(OnDatabaseChangedListener listener) {

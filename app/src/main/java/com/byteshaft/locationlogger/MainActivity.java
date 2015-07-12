@@ -22,9 +22,10 @@ public class MainActivity extends AppCompatActivity implements OnCheckedChangeLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         LocationDatabase database = new LocationDatabase(getApplicationContext());
-        ArrayList<HashMap> all_coordinates = database.getCoordinatesForID("10");
+        System.out.println(database.isDatabaseEmpty());
+        ArrayList<HashMap> allRecords = database.getAllRecords();
         final String SEPARATOR = ", ";
-        for (HashMap map : all_coordinates) {
+        for (HashMap map : allRecords) {
             System.out.println(map.get("longitude")
                             + SEPARATOR
                             + map.get("latitude")
