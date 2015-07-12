@@ -17,6 +17,8 @@ import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements OnCheckedChangeListener {
 
+    private Switch mServiceToggle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,8 +38,14 @@ public class MainActivity extends AppCompatActivity implements OnCheckedChangeLi
                             + map.get("user_id")
             );
         }
-        Switch toggle = (Switch) findViewById(R.id.switch_track_location);
-        toggle.setOnCheckedChangeListener(this);
+        mServiceToggle = (Switch) findViewById(R.id.switch_track_location);
+        mServiceToggle.setOnCheckedChangeListener(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mServiceToggle.setChecked(LocationService.isRunning());
     }
 
     @Override

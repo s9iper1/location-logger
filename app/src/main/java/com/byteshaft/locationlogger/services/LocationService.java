@@ -33,6 +33,11 @@ public class LocationService extends Service implements LocationListener,
     private IntentFilter alarmIntent = new IntentFilter("com.byteshaft.LOCATION_ALARM");
     private LocationHelpers mLocationHelpers;
     private LocationDatabase mLocationDatabase;
+    private static LocationService sInstance;
+
+    public static boolean isRunning() {
+        return sInstance != null;
+    }
 
     private BroadcastReceiver mLocationRequestAlarmReceiver = new BroadcastReceiver() {
         @Override
@@ -50,7 +55,7 @@ public class LocationService extends Service implements LocationListener,
                     String latitudeLast = LocationHelpers.getLatitudeAsString(mLocation);
                     String longitudeLast = LocationHelpers.getLongitudeAsString(mLocation);
                     mLocationDatabase.createNewEntry(
-                            longitudeLast, latitudeLast, LocationHelpers.getTimeStamp(), "10");
+                            longitudeLast, latitudeLast, LocationHelpers.getTimeStamp(), getUserId());
                     Log.w(LOG_TAG, "Failed to get location current location, saving last known location");
                     stopLocationUpdate();
                 } else {
@@ -66,7 +71,7 @@ public class LocationService extends Service implements LocationListener,
                 String latitude = LocationHelpers.getLatitudeAsString(mLocation);
                 String longitude = LocationHelpers.getLongitudeAsString(mLocation);
                 mLocationDatabase.createNewEntry(
-                        longitude, latitude, LocationHelpers.getTimeStamp(), "10");
+                        longitude, latitude, LocationHelpers.getTimeStamp(), getUserId());
                 stopLocationUpdate();
             }
         }
@@ -95,6 +100,7 @@ public class LocationService extends Service implements LocationListener,
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        sInstance = this;
         mLocationHelpers = new LocationHelpers(getApplicationContext());
         mLocationDatabase = new LocationDatabase(getApplicationContext());
         mLocationDatabase.setOnDatabaseChangedListener(this);
@@ -109,6 +115,7 @@ public class LocationService extends Service implements LocationListener,
         mLocationHelpers.getHandler().removeCallbacks(mLocationRunnable);
         reset();
         unregisterReceiver(mLocationRequestAlarmReceiver);
+        sInstance = null;
     }
 
     @Override
@@ -165,9 +172,16 @@ public class LocationService extends Service implements LocationListener,
         handler.postDelayed(mLocationRunnable, 5000);
     }
 
+    private String getUserId() {
+        // TODO: doesn't return anything useful right now
+        return "10";
+    }
+
     @Override
     public void onNewEntryCreated() {
-        Intent intent = new Intent(getApplicationContext(), LocationUploadService.class);
-        startService(intent);
+        if (!LocationUploadService.isRunning()) {
+            Intent intent = new Intent(getApplicationContext(), LocationUploadService.class);
+            startService(intent);
+        }
     }
 }

@@ -17,8 +17,15 @@ import java.util.HashMap;
 
 public class LocationUploadService extends IntentService {
 
+    private static LocationUploadService sInstance;
+
+    public static boolean isRunning() {
+        return sInstance != null;
+    }
+
     public LocationUploadService() {
         super("LocationUploadService");
+        sInstance = this;
     }
 
     @Override
@@ -42,6 +49,12 @@ public class LocationUploadService extends IntentService {
                 }
             }
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        sInstance = null;
     }
 
     private boolean isNetworkAvailable() {
