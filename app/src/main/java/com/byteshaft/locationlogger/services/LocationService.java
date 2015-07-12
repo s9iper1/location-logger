@@ -40,6 +40,37 @@ public class LocationService extends Service implements LocationListener,
             startLocationUpdate();
         }
     };
+    private Runnable mLocationRunnable = new Runnable() {
+        @Override
+        public void run() {
+            String LOG_TAG = "LocationLogger";
+            if (mLocation == null && mLocationRecursionCounter > 24) {
+                mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                if (mLocation != null) {
+                    String latitudeLast = LocationHelpers.getLatitudeAsString(mLocation);
+                    String longitudeLast = LocationHelpers.getLongitudeAsString(mLocation);
+                    mLocationDatabase.createNewEntry(
+                            longitudeLast, latitudeLast, LocationHelpers.getTimeStamp(), "10");
+                    Log.w(LOG_TAG, "Failed to get location current location, saving last known location");
+                    stopLocationUpdate();
+                } else {
+                    Log.e(LOG_TAG, "Failed to get location");
+                    stopLocationUpdate();
+                }
+            } else if (mLocation == null) {
+                acquireLocation();
+                mLocationRecursionCounter++;
+                Log.i(LOG_TAG, "Tracker Thread Running: " + mLocationRecursionCounter);
+            } else {
+                Log.i(LOG_TAG, "Location found, saving to database");
+                String latitude = LocationHelpers.getLatitudeAsString(mLocation);
+                String longitude = LocationHelpers.getLongitudeAsString(mLocation);
+                mLocationDatabase.createNewEntry(
+                        longitude, latitude, LocationHelpers.getTimeStamp(), "10");
+                stopLocationUpdate();
+            }
+        }
+    };
 
     private void startLocationUpdate() {
         connectGoogleApiClient();
@@ -133,38 +164,6 @@ public class LocationService extends Service implements LocationListener,
         Handler handler = mLocationHelpers.getHandler();
         handler.postDelayed(mLocationRunnable, 5000);
     }
-
-    private Runnable mLocationRunnable = new Runnable() {
-        @Override
-        public void run() {
-            String LOG_TAG = "LocationLogger";
-            if (mLocation == null && mLocationRecursionCounter > 24) {
-                mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                if (mLocation != null) {
-                    String latitudeLast = LocationHelpers.getLatitudeAsString(mLocation);
-                    String longitudeLast = LocationHelpers.getLongitudeAsString(mLocation);
-                    mLocationDatabase.createNewEntry(
-                            longitudeLast, latitudeLast, LocationHelpers.getTimeStamp(), "10");
-                    Log.w(LOG_TAG, "Failed to get location current location, saving last known location");
-                    stopLocationUpdate();
-                } else {
-                    Log.e(LOG_TAG, "Failed to get location");
-                    stopLocationUpdate();
-                }
-            } else if (mLocation == null) {
-                acquireLocation();
-                mLocationRecursionCounter++;
-                Log.i(LOG_TAG, "Tracker Thread Running: " + mLocationRecursionCounter);
-            } else {
-                Log.i(LOG_TAG, "Location found, saving to database");
-                String latitude = LocationHelpers.getLatitudeAsString(mLocation);
-                String longitude = LocationHelpers.getLongitudeAsString(mLocation);
-                mLocationDatabase.createNewEntry(
-                        longitude, latitude, LocationHelpers.getTimeStamp(), "10");
-                stopLocationUpdate();
-            }
-        }
-    };
 
     @Override
     public void onNewEntryCreated() {

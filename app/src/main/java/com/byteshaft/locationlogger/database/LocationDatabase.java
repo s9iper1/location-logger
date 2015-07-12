@@ -76,13 +76,13 @@ public class LocationDatabase extends SQLiteOpenHelper {
         mListeners.add(listener);
     }
 
-    public interface OnDatabaseChangedListener {
-        void onNewEntryCreated();
-    }
-
     private void dispatchEventOnNewEntryCreated() {
         for (OnDatabaseChangedListener listener : mListeners) {
             listener.onNewEntryCreated();
         }
+    }
+
+    public interface OnDatabaseChangedListener {
+        void onNewEntryCreated();
     }
 }

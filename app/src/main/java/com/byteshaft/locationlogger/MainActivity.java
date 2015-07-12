@@ -26,12 +26,12 @@ public class MainActivity extends AppCompatActivity implements OnCheckedChangeLi
         final String SEPARATOR = ", ";
         for (HashMap map : all_coordinates) {
             System.out.println(map.get("longitude")
-                    + SEPARATOR
-                    + map.get("latitude")
-                    + SEPARATOR
-                    + map.get("time_stamp")
-                    + SEPARATOR
-                    + map.get("user_id")
+                            + SEPARATOR
+                            + map.get("latitude")
+                            + SEPARATOR
+                            + map.get("time_stamp")
+                            + SEPARATOR
+                            + map.get("user_id")
             );
         }
         Switch toggle = (Switch) findViewById(R.id.switch_track_location);
