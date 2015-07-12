@@ -1,7 +1,5 @@
 package com.byteshaft.locationlogger.services;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,8 +10,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
+import com.byteshaft.locationlogger.R;
 import com.byteshaft.locationlogger.database.LocationDatabase;
 import com.byteshaft.locationlogger.utils.LocationHelpers;
 import com.google.android.gms.common.ConnectionResult;
@@ -22,17 +20,18 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import java.util.concurrent.TimeUnit;
+
 public class LocationService extends Service implements LocationListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
     private Location mLocation;
     private int mLocationRecursionCounter;
     private int mLocationChangedCounter;
     private IntentFilter alarmIntent = new IntentFilter("com.byteshaft.LOCATION_ALARM");
     private final String LOG_TAG = "LocationLogger";
-    private Handler mHandler;
+    private LocationHelpers mLocationHelpers;
 
     private BroadcastReceiver mLocationRequestAlarmReceiver = new BroadcastReceiver() {
         @Override
@@ -41,27 +40,18 @@ public class LocationService extends Service implements LocationListener,
         }
     };
 
-    private void setLocationAlarm(int time) {
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        Intent intent = new Intent("com.byteshaft.LOCATION_ALARM");
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + time, pendingIntent);
-    }
-
     private void startLocationUpdate() {
-        mLocationRequest = LocationHelpers.createLocationRequest();
         connectGoogleApiClient();
     }
 
     private void stopLocationUpdate() {
-        resetReceivingLocation();
-//        int requestInterval = Integer.valueOf(getString(R.string.location_interval));
-//        int intervalInMillis = (int) TimeUnit.MINUTES.toMillis(requestInterval);
-//        setLocationAlarm(intervalInMillis);
+        reset();
+        int requestInterval = Integer.valueOf(getString(R.string.location_interval));
+        int intervalInMillis = (int) TimeUnit.MINUTES.toMillis(requestInterval);
+        mLocationHelpers.setLocationAlarm(intervalInMillis);
     }
 
-    private void resetReceivingLocation() {
+    private void reset() {
         mLocationChangedCounter = 0;
         mLocationRecursionCounter = 0;
         if (mGoogleApiClient.isConnected()) {
@@ -72,6 +62,7 @@ public class LocationService extends Service implements LocationListener,
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        mLocationHelpers = new LocationHelpers(getApplicationContext());
         registerReceiver(mLocationRequestAlarmReceiver, alarmIntent);
         startLocationUpdate();
         return START_STICKY;
@@ -80,8 +71,8 @@ public class LocationService extends Service implements LocationListener,
     @Override
     public void onDestroy() {
         super.onDestroy();
-        getHandler().removeCallbacks(mLocationRunnable);
-        resetReceivingLocation();
+        mLocationHelpers.getHandler().removeCallbacks(mLocationRunnable);
+        reset();
         unregisterReceiver(mLocationRequestAlarmReceiver);
     }
 
@@ -129,20 +120,14 @@ public class LocationService extends Service implements LocationListener,
     }
 
     private void startLocationUpdates() {
+        LocationRequest locationRequest = mLocationHelpers.getLocationRequest();
         LocationServices.FusedLocationApi.requestLocationUpdates(
-                mGoogleApiClient, mLocationRequest, this);
+                mGoogleApiClient, locationRequest, this);
     }
 
     private void acquireLocation() {
-        Handler handler = getHandler();
+        Handler handler = mLocationHelpers.getHandler();
         handler.postDelayed(mLocationRunnable, 5000);
-    }
-
-    private Handler getHandler() {
-        if (mHandler == null) {
-            mHandler = new Handler();
-        }
-        return mHandler;
     }
 
     private Runnable mLocationRunnable = new Runnable() {
@@ -151,8 +136,8 @@ public class LocationService extends Service implements LocationListener,
             if (mLocation == null && mLocationRecursionCounter > 24) {
                 mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                 if (mLocation != null) {
-                    String latLast = String.valueOf(mLocation.getLatitude());
-                    String lonLast = String.valueOf(mLocation.getLongitude());
+                    String latLast = LocationHelpers.getLatitudeAsString(mLocation);
+                    String lonLast = LocationHelpers.getLongitudeAsString(mLocation);
                     Log.w(LOG_TAG, "Failed to get location current location, saving last known location");
                     stopLocationUpdate();
                 } else {
@@ -165,8 +150,8 @@ public class LocationService extends Service implements LocationListener,
                 Log.i(LOG_TAG, "Tracker Thread Running: " + mLocationRecursionCounter);
             } else {
                 Log.i(LOG_TAG, "Location found, saving to database");
-                String lat = String.valueOf(mLocation.getLatitude());
-                String lon = String.valueOf(mLocation.getLongitude());
+                String lat = LocationHelpers.getLatitudeAsString(mLocation);
+                String lon = LocationHelpers.getLongitudeAsString(mLocation);
                 LocationDatabase database = new LocationDatabase(getApplicationContext());
                 database.createNewEntry(
                         lon, lat, LocationHelpers.getTimeStamp(), "10");
