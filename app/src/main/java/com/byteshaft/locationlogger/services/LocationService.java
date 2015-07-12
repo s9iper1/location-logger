@@ -32,6 +32,7 @@ public class LocationService extends Service implements LocationListener,
     private int mLocationChangedCounter;
     private IntentFilter alarmIntent = new IntentFilter("com.byteshaft.LOCATION_ALARM");
     private final String LOG_TAG = "LocationLogger";
+    private Handler mHandler;
 
     private BroadcastReceiver mLocationRequestAlarmReceiver = new BroadcastReceiver() {
         @Override
@@ -54,34 +55,38 @@ public class LocationService extends Service implements LocationListener,
     }
 
     private void stopLocationUpdate() {
+        resetReceivingLocation();
+//        int requestInterval = Integer.valueOf(getString(R.string.location_interval));
+//        int intervalInMillis = (int) TimeUnit.MINUTES.toMillis(requestInterval);
+//        setLocationAlarm(intervalInMillis);
+    }
+
+    private void resetReceivingLocation() {
         mLocationChangedCounter = 0;
         mLocationRecursionCounter = 0;
         if (mGoogleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
         }
-//        int requestInterval = Integer.valueOf(getString(R.string.location_interval));
-//        int intervalInMillis = (int) TimeUnit.MINUTES.toMillis(requestInterval);
-//        setLocationAlarm(intervalInMillis);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         registerReceiver(mLocationRequestAlarmReceiver, alarmIntent);
         startLocationUpdate();
-
         return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        getHandler().removeCallbacks(mLocationRunnable);
+        resetReceivingLocation();
         unregisterReceiver(mLocationRequestAlarmReceiver);
     }
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        stopSelf();
         super.onTaskRemoved(rootIntent);
     }
 
@@ -129,36 +134,46 @@ public class LocationService extends Service implements LocationListener,
     }
 
     private void acquireLocation() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (mLocation == null && mLocationRecursionCounter > 24) {
-                    mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                    if (mLocation != null) {
-                        String latLast = String.valueOf(mLocation.getLatitude());
-                        String lonLast = String.valueOf(mLocation.getLongitude());
-                        Log.w(LOG_TAG, "Failed to get location current location, saving last known location");
-                        stopLocationUpdate();
-                    } else {
-                        Log.e(LOG_TAG, "Failed to get location");
-                        stopLocationUpdate();
-                    }
-                } else if (mLocation == null) {
-                    acquireLocation();
-                    mLocationRecursionCounter++;
-                    Log.i(LOG_TAG, "Tracker Thread Running: " + mLocationRecursionCounter);
-                } else {
-                    Log.i(LOG_TAG, "Location found, saving to database");
-                    String lat = String.valueOf(mLocation.getLatitude());
-                    String lon = String.valueOf(mLocation.getLongitude());
-                    LocationDatabase database = new LocationDatabase(getApplicationContext());
-                    database.createNewEntry(
-                            lon, lat, LocationHelpers.getTimeStamp(), "10");
+        Handler handler = getHandler();
+        handler.postDelayed(mLocationRunnable, 5000);
+    }
 
-                    mLocation = null;
+    private Handler getHandler() {
+        if (mHandler == null) {
+            mHandler = new Handler();
+        }
+        return mHandler;
+    }
+
+    private Runnable mLocationRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (mLocation == null && mLocationRecursionCounter > 24) {
+                mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                if (mLocation != null) {
+                    String latLast = String.valueOf(mLocation.getLatitude());
+                    String lonLast = String.valueOf(mLocation.getLongitude());
+                    Log.w(LOG_TAG, "Failed to get location current location, saving last known location");
+                    stopLocationUpdate();
+                } else {
+                    Log.e(LOG_TAG, "Failed to get location");
                     stopLocationUpdate();
                 }
+            } else if (mLocation == null) {
+                acquireLocation();
+                mLocationRecursionCounter++;
+                Log.i(LOG_TAG, "Tracker Thread Running: " + mLocationRecursionCounter);
+            } else {
+                Log.i(LOG_TAG, "Location found, saving to database");
+                String lat = String.valueOf(mLocation.getLatitude());
+                String lon = String.valueOf(mLocation.getLongitude());
+                LocationDatabase database = new LocationDatabase(getApplicationContext());
+                database.createNewEntry(
+                        lon, lat, LocationHelpers.getTimeStamp(), "10");
+
+                mLocation = null;
+                stopLocationUpdate();
             }
-        }, 5000);
-    }
+        }
+    };
 }
