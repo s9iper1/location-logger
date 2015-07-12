@@ -40,11 +40,11 @@ public class LocationDatabase extends SQLiteOpenHelper {
     }
 
     public ArrayList<HashMap> getCoordinatesForID(String ID) {
-        SQLiteDatabase db = getWritableDatabase();
+        SQLiteDatabase db = getReadableDatabase();
         String query = "SELECT * FROM "
                 + DatabaseConstants.TABLE_NAME
                 + " WHERE "
-                + DatabaseConstants.ID_COLUMN
+                + DatabaseConstants.USER_ID_COLUMN
                 + "="
                 + ID;
         Cursor cursor = db.rawQuery(query, null);
@@ -54,9 +54,12 @@ public class LocationDatabase extends SQLiteOpenHelper {
                     cursor.getColumnIndex(DatabaseConstants.LONGITUDE_COLUMN));
             String latitude = cursor.getString(
                     cursor.getColumnIndex(DatabaseConstants.LATITUDE_COLUMN));
+            String time = cursor.getString(
+                    cursor.getColumnIndex(DatabaseConstants.TIME_STAMP_COLUMN));
             HashMap<String, String> hashMap = new HashMap<>();
             hashMap.put("longitude", longitude);
             hashMap.put("latitude", latitude);
+            hashMap.put("timestamp", time);
             list.add(hashMap);
         }
         cursor.close();

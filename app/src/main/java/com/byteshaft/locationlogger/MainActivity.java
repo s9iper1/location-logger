@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         LocationDatabase database = new LocationDatabase(getApplicationContext());
         ArrayList<HashMap> all_coordinates = database.getCoordinatesForID("10");
         for (HashMap map : all_coordinates) {
-            System.out.println(map.get("longitude") + ", " + map.get("latitude"));
+            System.out.println(map.get("longitude") + ", " + map.get("latitude") + ", " + map.get("timestamp"));
         }
         Intent service = new Intent(this, LocationService.class);
         startService(service);
