@@ -60,6 +60,7 @@ public class LocationService extends Service implements LocationListener,
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
         }
+        mLocation = null;
     }
 
     @Override
@@ -140,8 +141,10 @@ public class LocationService extends Service implements LocationListener,
             if (mLocation == null && mLocationRecursionCounter > 24) {
                 mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                 if (mLocation != null) {
-                    String latLast = LocationHelpers.getLatitudeAsString(mLocation);
-                    String lonLast = LocationHelpers.getLongitudeAsString(mLocation);
+                    String latitudeLast = LocationHelpers.getLatitudeAsString(mLocation);
+                    String longitudeLast = LocationHelpers.getLongitudeAsString(mLocation);
+                    mLocationDatabase.createNewEntry(
+                            longitudeLast, latitudeLast, LocationHelpers.getTimeStamp(), "10");
                     Log.w(LOG_TAG, "Failed to get location current location, saving last known location");
                     stopLocationUpdate();
                 } else {
@@ -154,11 +157,10 @@ public class LocationService extends Service implements LocationListener,
                 Log.i(LOG_TAG, "Tracker Thread Running: " + mLocationRecursionCounter);
             } else {
                 Log.i(LOG_TAG, "Location found, saving to database");
-                String lat = LocationHelpers.getLatitudeAsString(mLocation);
-                String lon = LocationHelpers.getLongitudeAsString(mLocation);
+                String latitude = LocationHelpers.getLatitudeAsString(mLocation);
+                String longitude = LocationHelpers.getLongitudeAsString(mLocation);
                 mLocationDatabase.createNewEntry(
-                        lon, lat, LocationHelpers.getTimeStamp(), "10");
-                mLocation = null;
+                        longitude, latitude, LocationHelpers.getTimeStamp(), "10");
                 stopLocationUpdate();
             }
         }
