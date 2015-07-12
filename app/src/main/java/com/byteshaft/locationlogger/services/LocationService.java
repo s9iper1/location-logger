@@ -28,6 +28,7 @@ public class LocationService extends Service implements LocationListener,
     private GoogleApiClient mGoogleApiClient;
     private Location mLocation;
     private int mLocationRecursionCounter;
+    private int mLocationChangedCounter;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -66,7 +67,10 @@ public class LocationService extends Service implements LocationListener,
 
     @Override
     public void onLocationChanged(Location location) {
-
+        mLocationChangedCounter++;
+        if (mLocationChangedCounter == 5) {
+            mLocation = location;
+        }
     }
 
     @Override
