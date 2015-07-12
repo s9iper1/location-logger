@@ -31,7 +31,6 @@ public class LocationService extends Service implements LocationListener,
     private int mLocationRecursionCounter;
     private int mLocationChangedCounter;
     private IntentFilter alarmIntent = new IntentFilter("com.byteshaft.LOCATION_ALARM");
-    private final String LOG_TAG = "LocationLogger";
     private LocationHelpers mLocationHelpers;
     private LocationDatabase mLocationDatabase;
 
@@ -138,6 +137,7 @@ public class LocationService extends Service implements LocationListener,
     private Runnable mLocationRunnable = new Runnable() {
         @Override
         public void run() {
+            String LOG_TAG = "LocationLogger";
             if (mLocation == null && mLocationRecursionCounter > 24) {
                 mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                 if (mLocation != null) {

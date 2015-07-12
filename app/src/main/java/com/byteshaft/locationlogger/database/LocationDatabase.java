@@ -77,7 +77,7 @@ public class LocationDatabase extends SQLiteOpenHelper {
     }
 
     public interface OnDatabaseChangedListener {
-        public void onNewEntryCreated();
+        void onNewEntryCreated();
     }
 
     private void dispatchEventOnNewEntryCreated() {
