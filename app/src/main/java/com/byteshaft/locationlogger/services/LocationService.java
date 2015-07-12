@@ -71,18 +71,6 @@ public class LocationService extends Service implements LocationListener,
     }
 
     @Override
-    public void onDestroy() {
-        stopLocationUpdate();
-        super.onDestroy();
-    }
-
-    @Override
-    public void onTaskRemoved(Intent rootIntent) {
-        stopSelf();
-        super.onTaskRemoved(rootIntent);
-    }
-
-    @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
