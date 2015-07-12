@@ -33,6 +33,7 @@ public class LocationService extends Service implements LocationListener,
     private IntentFilter alarmIntent = new IntentFilter("com.byteshaft.LOCATION_ALARM");
     private final String LOG_TAG = "LocationLogger";
     private LocationHelpers mLocationHelpers;
+    private LocationDatabase mLocationDatabase;
 
     private BroadcastReceiver mLocationRequestAlarmReceiver = new BroadcastReceiver() {
         @Override
@@ -64,6 +65,8 @@ public class LocationService extends Service implements LocationListener,
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         mLocationHelpers = new LocationHelpers(getApplicationContext());
+        mLocationDatabase = new LocationDatabase(getApplicationContext());
+        mLocationDatabase.setOnDatabaseChangedListener(this);
         registerReceiver(mLocationRequestAlarmReceiver, alarmIntent);
         startLocationUpdate();
         return START_STICKY;
@@ -153,10 +156,8 @@ public class LocationService extends Service implements LocationListener,
                 Log.i(LOG_TAG, "Location found, saving to database");
                 String lat = LocationHelpers.getLatitudeAsString(mLocation);
                 String lon = LocationHelpers.getLongitudeAsString(mLocation);
-                LocationDatabase database = new LocationDatabase(getApplicationContext());
-                database.createNewEntry(
+                mLocationDatabase.createNewEntry(
                         lon, lat, LocationHelpers.getTimeStamp(), "10");
-
                 mLocation = null;
                 stopLocationUpdate();
             }
