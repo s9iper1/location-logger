@@ -155,7 +155,7 @@ public class LocationService extends Service implements LocationListener,
                     String lon = String.valueOf(mLocation.getLongitude());
                     LocationDatabase database = new LocationDatabase(getApplicationContext());
                     database.createNewEntry(
-                            lon, lat, String.valueOf(System.currentTimeMillis()), "10");
+                            lon, lat, LocationHelpers.getTimeStamp(), "10");
 
                     mLocation = null;
                     stopLocationUpdate();
