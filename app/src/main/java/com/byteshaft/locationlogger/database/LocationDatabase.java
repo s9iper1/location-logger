@@ -48,6 +48,8 @@ public class LocationDatabase extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(query, null);
         ArrayList<HashMap> list = new ArrayList<>();
         while (cursor.moveToNext()) {
+            int unique_id = cursor.getInt(
+                    cursor.getColumnIndex(DatabaseConstants.ID_COLUMN));
             String longitude = cursor.getString(
                     cursor.getColumnIndex(DatabaseConstants.LONGITUDE_COLUMN));
             String latitude = cursor.getString(
@@ -57,6 +59,7 @@ public class LocationDatabase extends SQLiteOpenHelper {
             String userID = cursor.getString(
                     cursor.getColumnIndex(DatabaseConstants.USER_ID_COLUMN));
             HashMap<String, String> hashMap = new HashMap<>();
+            hashMap.put("unique_id", String.valueOf(unique_id));
             hashMap.put("longitude", longitude);
             hashMap.put("latitude", latitude);
             hashMap.put("time_stamp", time);
@@ -67,7 +70,20 @@ public class LocationDatabase extends SQLiteOpenHelper {
         return list;
     }
 
-    public boolean isDatabaseEmpty() {
+    public void deleteEntry(int ID) {
+        SQLiteDatabase db = getWritableDatabase();
+        String query = "DELETE FROM "
+                + DatabaseConstants.TABLE_NAME
+                + " WHERE "
+                + DatabaseConstants.ID_COLUMN
+                + "="
+                + ID;
+        Cursor cursor = db.rawQuery(query, null);
+        cursor.moveToFirst();
+        cursor.close();
+    }
+
+    public boolean isEmpty() {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + DatabaseConstants.TABLE_NAME, null);
         boolean isEmpty;

@@ -169,5 +169,7 @@ public class LocationService extends Service implements LocationListener,
     public void onNewEntryCreated() {
         // Implement On Demand Upload here.
         // Note: there is still need for an Internet State Listener.
+        Intent intent = new Intent(getApplicationContext(), LocationUploadService.class);
+        startService(intent);
     }
 }
