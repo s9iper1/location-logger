@@ -141,8 +141,10 @@ public class LocationService extends Service implements LocationListener,
             if (mLocation == null && mLocationRecursionCounter > 24) {
                 mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                 if (mLocation != null) {
-                    String latLast = LocationHelpers.getLatitudeAsString(mLocation);
-                    String lonLast = LocationHelpers.getLongitudeAsString(mLocation);
+                    String latitudeLast = LocationHelpers.getLatitudeAsString(mLocation);
+                    String longitudeLast = LocationHelpers.getLongitudeAsString(mLocation);
+                    mLocationDatabase.createNewEntry(
+                            longitudeLast, latitudeLast, LocationHelpers.getTimeStamp(), "10");
                     Log.w(LOG_TAG, "Failed to get location current location, saving last known location");
                     stopLocationUpdate();
                 } else {
