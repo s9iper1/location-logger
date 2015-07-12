@@ -23,7 +23,8 @@ import com.google.android.gms.location.LocationServices;
 import java.util.concurrent.TimeUnit;
 
 public class LocationService extends Service implements LocationListener,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+        LocationDatabase.OnDatabaseChangedListener {
 
     private GoogleApiClient mGoogleApiClient;
     private Location mLocation;
@@ -161,4 +162,10 @@ public class LocationService extends Service implements LocationListener,
             }
         }
     };
+
+    @Override
+    public void onNewEntryCreated() {
+        // Implement On Demand Upload here.
+        // Note: there is still need for an Internet State Listener.
+    }
 }
