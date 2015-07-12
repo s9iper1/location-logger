@@ -7,17 +7,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
-import android.util.TimeUtils;
 import android.widget.Toast;
 
-import com.byteshaft.locationlogger.R;
 import com.byteshaft.locationlogger.database.LocationDatabase;
 import com.byteshaft.locationlogger.utils.LocationHelpers;
 import com.google.android.gms.common.ConnectionResult;
@@ -25,10 +21,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class LocationService extends Service implements LocationListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -65,9 +57,9 @@ public class LocationService extends Service implements LocationListener,
         mLocationRecursionCounter = 0;
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         mGoogleApiClient.disconnect();
-        int requestInterval = Integer.valueOf(getString(R.string.location_interval));
-        int intervalInMillis = (int) TimeUnit.MINUTES.toMillis(requestInterval);
-        setLocationAlarm(intervalInMillis);
+//        int requestInterval = Integer.valueOf(getString(R.string.location_interval));
+//        int intervalInMillis = (int) TimeUnit.MINUTES.toMillis(requestInterval);
+//        setLocationAlarm(intervalInMillis);
     }
 
     @Override
