@@ -28,6 +28,7 @@
             </intent-filter>
         </receiver>
         <service android:name=".services.LocationService" android:enabled="true"/>
+        <service android:name=".services.LocationUploadService" android:enabled="true"/>
     </application>
 
 </manifest>
