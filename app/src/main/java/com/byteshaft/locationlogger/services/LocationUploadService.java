@@ -34,7 +34,11 @@ public class LocationUploadService extends IntentService {
                     String timeStamp = (String) map.get("time_stamp");
                     String userId = (String) map.get("user_id");
                     System.out.println("Internet is working: will upload" + id);
-                    // TODO: Implement Upload here: if successful use database.deleteEntry()
+                    boolean uploaded = false;
+                    // TODO: Implement Upload here:
+                    if (uploaded) {
+                        database.deleteEntry(Integer.valueOf(id));
+                    }
                 }
             }
         }
