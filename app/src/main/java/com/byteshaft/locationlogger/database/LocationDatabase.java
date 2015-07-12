@@ -44,7 +44,7 @@ public class LocationDatabase extends SQLiteOpenHelper {
         String query = "SELECT * FROM "
                 + DatabaseConstants.TABLE_NAME
                 + " WHERE "
-                + DatabaseConstants.USER_ID_COLUMN
+                + DatabaseConstants.ID_COLUMN
                 + "="
                 + ID;
         Cursor cursor = db.rawQuery(query, null);
