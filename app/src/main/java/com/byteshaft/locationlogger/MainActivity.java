@@ -20,8 +20,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         LocationDatabase database = new LocationDatabase(getApplicationContext());
         ArrayList<HashMap> all_coordinates = database.getCoordinatesForID("10");
+        final String SEPARATOR = ", ";
         for (HashMap map : all_coordinates) {
-            System.out.println(map.get("longitude") + ", " + map.get("latitude") + ", " + map.get("timestamp"));
+            System.out.println(map.get("longitude")
+                    + SEPARATOR
+                    + map.get("latitude")
+                    + SEPARATOR
+                    + map.get("time_stamp")
+                    + SEPARATOR
+                    + map.get("user_id")
+            );
         }
         Intent service = new Intent(this, LocationService.class);
         startService(service);

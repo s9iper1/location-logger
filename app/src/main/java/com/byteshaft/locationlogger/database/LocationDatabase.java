@@ -56,10 +56,13 @@ public class LocationDatabase extends SQLiteOpenHelper {
                     cursor.getColumnIndex(DatabaseConstants.LATITUDE_COLUMN));
             String time = cursor.getString(
                     cursor.getColumnIndex(DatabaseConstants.TIME_STAMP_COLUMN));
+            String userID = cursor.getString(
+                    cursor.getColumnIndex(DatabaseConstants.USER_ID_COLUMN));
             HashMap<String, String> hashMap = new HashMap<>();
             hashMap.put("longitude", longitude);
             hashMap.put("latitude", latitude);
-            hashMap.put("timestamp", time);
+            hashMap.put("time_stamp", time);
+            hashMap.put("user_id", userID);
             list.add(hashMap);
         }
         cursor.close();
