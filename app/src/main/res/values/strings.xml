@@ -1,6 +1,4 @@
 <resources>
     <string name="app_name">Location Logger</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
     <string name="location_interval">2</string>
 </resources>

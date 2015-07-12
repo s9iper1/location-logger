@@ -24,18 +24,6 @@ public class LocationHelpers extends ContextWrapper {
         super(base);
     }
 
-    public LocationRequest getLocationRequest() {
-        long INTERVAL = 0;
-        long FASTEST_INTERVAL = 0;
-        if (mLocationRequest == null) {
-            mLocationRequest = new LocationRequest();
-            mLocationRequest.setInterval(INTERVAL);
-            mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
-            mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        }
-        return mLocationRequest;
-    }
-
     public static String getTimeStamp() {
         TimeZone timeZone = TimeZone.getTimeZone("UTC");
         Calendar calendar = Calendar.getInstance(timeZone);
@@ -51,6 +39,18 @@ public class LocationHelpers extends ContextWrapper {
 
     public static String getLatitudeAsString(Location location) {
         return String.valueOf(location.getLatitude());
+    }
+
+    public LocationRequest getLocationRequest() {
+        long INTERVAL = 0;
+        long FASTEST_INTERVAL = 0;
+        if (mLocationRequest == null) {
+            mLocationRequest = new LocationRequest();
+            mLocationRequest.setInterval(INTERVAL);
+            mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
+            mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        }
+        return mLocationRequest;
     }
 
     public void setLocationAlarm(int time) {
