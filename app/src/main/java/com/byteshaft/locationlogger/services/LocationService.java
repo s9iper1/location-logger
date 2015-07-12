@@ -60,6 +60,7 @@ public class LocationService extends Service implements LocationListener,
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
         }
+        mLocation = null;
     }
 
     @Override
@@ -154,11 +155,10 @@ public class LocationService extends Service implements LocationListener,
                 Log.i(LOG_TAG, "Tracker Thread Running: " + mLocationRecursionCounter);
             } else {
                 Log.i(LOG_TAG, "Location found, saving to database");
-                String lat = LocationHelpers.getLatitudeAsString(mLocation);
-                String lon = LocationHelpers.getLongitudeAsString(mLocation);
+                String latitude = LocationHelpers.getLatitudeAsString(mLocation);
+                String longitude = LocationHelpers.getLongitudeAsString(mLocation);
                 mLocationDatabase.createNewEntry(
-                        lon, lat, LocationHelpers.getTimeStamp(), "10");
-                mLocation = null;
+                        longitude, latitude, LocationHelpers.getTimeStamp(), "10");
                 stopLocationUpdate();
             }
         }
