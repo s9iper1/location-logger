@@ -19,6 +19,7 @@
         android:layout_marginTop="115dp" />
 
     <EditText
+        android:id="@+id/editTextID"
         android:layout_width="150dp"
         android:layout_height="50dp"
         android:hint="Enter User ID..."
