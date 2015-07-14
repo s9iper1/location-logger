@@ -76,22 +76,6 @@ public class MainActivity extends AppCompatActivity implements OnCheckedChangeLi
 
             }
         });
-//        ed_text = editText.getText().toString().trim();
-//        editText.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if(ed_text.isEmpty() || ed_text.length() == 0 || ed_text.equals("") || ed_text == null)
-//                {
-//                    //EditText is empty
-//                    mServiceToggle.setClickable(false);
-//                }
-//                else
-//                {
-//                    //EditText is not empty
-//                    mServiceToggle.setClickable(true);
-//                }
-//            }
-//        });
     }
 
     @Override
