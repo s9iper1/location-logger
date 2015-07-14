@@ -6,7 +6,11 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import com.byteshaft.locationlogger.R;
 import com.byteshaft.locationlogger.database.LocationDatabase;
+import com.byteshaft.locationlogger.utils.WebServiceHelpers;
+
+import org.json.JSONException;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -30,23 +34,24 @@ public class LocationUploadService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        if (isNetworkAvailable()) {
-            if (isInternetWorking()) {
-                LocationDatabase database = new LocationDatabase(getApplicationContext());
-                ArrayList<HashMap> allRecords = database.getAllRecords();
-                for (HashMap map : allRecords) {
-                    String id = (String) map.get("unique_id");
-                    String longitude = (String) map.get("longitude");
-                    String latitude = (String) map.get("latitude");
-                    String timeStamp = (String) map.get("time_stamp");
-                    String userId = (String) map.get("user_id");
-                    System.out.println("Internet is working: will upload" + id);
-                    boolean uploaded = false;
-                    // TODO: Implement Upload here:
-                    if (uploaded) {
-                        database.deleteEntry(Integer.valueOf(id));
-                    }
-                }
+        LocationDatabase database = new LocationDatabase(getApplicationContext());
+        if (database.isEmpty()) {
+            database.close();
+            return;
+        }
+
+        if (isNetworkAvailable() && isInternetWorking()) {
+            ArrayList<HashMap> records = database.getAllRecords();
+            try {
+                String loginEmail = getString(R.string.server_login_email);
+                String loginPassword = getString(R.string.server_login_password);
+                String sessionId = WebServiceHelpers.getSessionId(loginEmail, loginPassword);
+                WebServiceHelpers.writeRecords(sessionId, records);
+                database.clearTable();
+                database.close();
+            } catch (IOException | JSONException e) {
+                database.close();
+                e.printStackTrace();
             }
         }
     }
@@ -71,8 +76,6 @@ public class LocationUploadService extends IntentService {
             connection.setConnectTimeout(10000);
             connection.connect();
             success = connection.getResponseCode() == 200;
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

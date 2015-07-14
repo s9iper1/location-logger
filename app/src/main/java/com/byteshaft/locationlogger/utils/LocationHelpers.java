@@ -28,7 +28,7 @@ public class LocationHelpers extends ContextWrapper {
         TimeZone timeZone = TimeZone.getTimeZone("UTC");
         Calendar calendar = Calendar.getInstance(timeZone);
         SimpleDateFormat simpleDateFormat =
-                new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.UK);
+                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.UK);
         simpleDateFormat.setTimeZone(timeZone);
         return simpleDateFormat.format(calendar.getTime());
     }

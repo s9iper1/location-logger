@@ -16,10 +16,11 @@
         android:text="Enable location logging"
         android:layout_below="@+id/imageView"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="115dp" />
+        android:layout_marginTop="115dp"
+        android:enabled="false"/>
 
     <EditText
-        android:id="@+id/editTextID"
+        android:id="@+id/entry_user_name"
         android:layout_width="150dp"
         android:layout_height="50dp"
         android:hint="Enter User ID..."

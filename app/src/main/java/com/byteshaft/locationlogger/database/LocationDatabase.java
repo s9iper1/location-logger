@@ -85,6 +85,13 @@ public class LocationDatabase extends SQLiteOpenHelper {
         cursor.close();
     }
 
+    public void clearTable() {
+        SQLiteDatabase db = getWritableDatabase();
+        String query = "DELETE FROM " + DatabaseConstants.TABLE_NAME;
+        db.execSQL(query);
+        db.close();
+    }
+
     public boolean isEmpty() {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + DatabaseConstants.TABLE_NAME, null);

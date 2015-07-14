@@ -6,82 +6,44 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.Switch;
 
-import com.byteshaft.locationlogger.database.LocationDatabase;
 import com.byteshaft.locationlogger.services.LocationService;
-
-import java.util.ArrayList;
-import java.util.HashMap;
+import com.byteshaft.locationlogger.utils.Helpers;
 
 
-public class MainActivity extends AppCompatActivity implements OnCheckedChangeListener {
+public class MainActivity extends AppCompatActivity implements OnCheckedChangeListener,
+        TextWatcher {
 
     private Switch mServiceToggle;
-    EditText editTextUserID;
+    private EditText mUserNameEntry;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        LocationDatabase database = new LocationDatabase(getApplicationContext());
-        ArrayList<HashMap> allRecords = database.getAllRecords();
-        final String SEPARATOR = ", ";
-        for (HashMap map : allRecords) {
-            System.out.println(map.get("unique_id")
-                            + SEPARATOR
-                            + map.get("longitude")
-                            + SEPARATOR
-                            + map.get("latitude")
-                            + SEPARATOR
-                            + map.get("time_stamp")
-                            + SEPARATOR
-                            + map.get("user_id")
-            );
-        }
         mServiceToggle = (Switch) findViewById(R.id.switch_track_location);
         mServiceToggle.setOnCheckedChangeListener(this);
-        editTextUserID = (EditText) findViewById(R.id.editTextID);
-        mServiceToggle.setEnabled(false);
-        editTextUserID.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                if(s.toString().trim().length() == 0){
-                    mServiceToggle.setEnabled(false);
-                } else {
-                    mServiceToggle.setEnabled(true);
-                }
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(s.toString().trim().length() == 0){
-                    mServiceToggle.setEnabled(false);
-                } else {
-                    mServiceToggle.setEnabled(true);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if(s.toString().trim().length() == 0){
-                    mServiceToggle.setEnabled(false);
-                } else {
-                    mServiceToggle.setEnabled(true);
-                }
-
-            }
-        });
+        mUserNameEntry = (EditText) findViewById(R.id.entry_user_name);
+        mUserNameEntry.addTextChangedListener(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mServiceToggle.setChecked(LocationService.isRunning());
+        if (!LocationService.isRunning()) {
+            mServiceToggle.setChecked(false);
+            mUserNameEntry.setEnabled(true);
+            mUserNameEntry.setText(Helpers.getUserId());
+        } else {
+            mUserNameEntry.setEnabled(false);
+            mUserNameEntry.setText(Helpers.getUserId());
+            mServiceToggle.setChecked(true);
+            mServiceToggle.setEnabled(true);
+        }
     }
 
     @Override
@@ -90,10 +52,38 @@ public class MainActivity extends AppCompatActivity implements OnCheckedChangeLi
             case R.id.switch_track_location:
                 Intent service = new Intent(this, LocationService.class);
                 if (b) {
+                    Helpers.setUserId(mUserNameEntry.getText().toString());
                     startService(service);
+                    mUserNameEntry.setEnabled(false);
                 } else {
                     stopService(service);
+                    mUserNameEntry.setEnabled(true);
                 }
+                Helpers.setServiceEnabled(b);
+        }
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        if (charSequence.toString().isEmpty() || charSequence.toString().length() < 3) {
+            mServiceToggle.setEnabled(false);
+        } else {
+            mServiceToggle.setEnabled(true);
+        }
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable editable) {
+        String result = editable.toString().replaceAll(" ", "");
+        if (!editable.toString().equals(result)) {
+            mUserNameEntry.setText(result);
+            mUserNameEntry.setSelection(result.length());
         }
     }
 }
