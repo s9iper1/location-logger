@@ -13,6 +13,7 @@ import android.util.Log;
 
 import com.byteshaft.locationlogger.R;
 import com.byteshaft.locationlogger.database.LocationDatabase;
+import com.byteshaft.locationlogger.utils.Helpers;
 import com.byteshaft.locationlogger.utils.LocationHelpers;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -54,8 +55,8 @@ public class LocationService extends Service implements LocationListener,
                 if (mLocation != null) {
                     String latitudeLast = LocationHelpers.getLatitudeAsString(mLocation);
                     String longitudeLast = LocationHelpers.getLongitudeAsString(mLocation);
-                    mLocationDatabase.createNewEntry(
-                            longitudeLast, latitudeLast, LocationHelpers.getTimeStamp(), getUserId());
+                    mLocationDatabase.createNewEntry(longitudeLast, latitudeLast,
+                            LocationHelpers.getTimeStamp(), Helpers.getUserId());
                     Log.w(LOG_TAG, "Failed to get location current location, saving last known location");
                     stopLocationUpdate();
                 } else {
@@ -71,7 +72,7 @@ public class LocationService extends Service implements LocationListener,
                 String latitude = LocationHelpers.getLatitudeAsString(mLocation);
                 String longitude = LocationHelpers.getLongitudeAsString(mLocation);
                 mLocationDatabase.createNewEntry(
-                        longitude, latitude, LocationHelpers.getTimeStamp(), getUserId());
+                        longitude, latitude, LocationHelpers.getTimeStamp(), Helpers.getUserId());
                 stopLocationUpdate();
             }
         }
@@ -170,11 +171,6 @@ public class LocationService extends Service implements LocationListener,
     private void acquireLocation() {
         Handler handler = mLocationHelpers.getHandler();
         handler.postDelayed(mLocationRunnable, 5000);
-    }
-
-    private String getUserId() {
-        // TODO: doesn't return anything useful right now
-        return "10";
     }
 
     @Override
