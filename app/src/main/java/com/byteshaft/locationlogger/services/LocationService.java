@@ -117,6 +117,7 @@ public class LocationService extends Service implements LocationListener,
         reset();
         unregisterReceiver(mLocationRequestAlarmReceiver);
         sInstance = null;
+        mLocationHelpers.cancelAlarmIfSet();
     }
 
     @Override
