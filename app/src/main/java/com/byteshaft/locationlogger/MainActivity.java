@@ -11,12 +11,8 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.Switch;
 
-import com.byteshaft.locationlogger.database.LocationDatabase;
 import com.byteshaft.locationlogger.services.LocationService;
 import com.byteshaft.locationlogger.utils.Helpers;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 
 public class MainActivity extends AppCompatActivity implements OnCheckedChangeListener,
@@ -84,6 +80,10 @@ public class MainActivity extends AppCompatActivity implements OnCheckedChangeLi
 
     @Override
     public void afterTextChanged(Editable editable) {
-
+        String result = editable.toString().replaceAll(" ", "");
+        if (!editable.toString().equals(result)) {
+            mUserNameEntry.setText(result);
+            mUserNameEntry.setSelection(result.length());
+        }
     }
 }
