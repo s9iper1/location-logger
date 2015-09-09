@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.byteshaft.locationlogger.utils.DatabaseConstants;
+import com.byteshaft.locationlogger.utils.Helpers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ public class LocationDatabase extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(DatabaseConstants.SSID_COLUMN,ssid);
+        values.put(DatabaseConstants.DEVICE_MAC, Helpers.getDeviceMac());
         values.put(DatabaseConstants.LONGITUDE_COLUMN, longitude);
         values.put(DatabaseConstants.LATITUDE_COLUMN, latitude);
         values.put(DatabaseConstants.TIME_STAMP_COLUMN, timestamp);
