@@ -7,6 +7,7 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Handler;
+import android.util.Log;
 
 import com.google.android.gms.location.LocationRequest;
 
@@ -19,6 +20,9 @@ public class LocationHelpers extends ContextWrapper {
 
     private Handler mHandler;
     private LocationRequest mLocationRequest;
+    private AlarmManager mAlarmManager;
+    private PendingIntent mPendingIntent;
+    private final int UNIQUE_ID_FOR_ALARM = 21;
 
     public LocationHelpers(Context base) {
         super(base);
@@ -53,12 +57,35 @@ public class LocationHelpers extends ContextWrapper {
         return mLocationRequest;
     }
 
+    private Intent getIntent() {
+        return new Intent("com.byteshaft.LOCATION_ALARM");
+    }
+
+    private AlarmManager getAlarmManager() {
+        return (AlarmManager) getSystemService(ALARM_SERVICE);
+    }
+
     public void setLocationAlarm(int time) {
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        Intent intent = new Intent("com.byteshaft.LOCATION_ALARM");
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + time, pendingIntent);
+        mAlarmManager = getAlarmManager();
+        Intent intent = getIntent();
+        mPendingIntent = PendingIntent.getBroadcast(
+                getApplicationContext(), UNIQUE_ID_FOR_ALARM, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mAlarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + time, mPendingIntent);
+    }
+
+    public void cancelAlarmIfSet() {
+        boolean isAlarmSet = isAlarmSet();
+        if (isAlarmSet) {
+            mAlarmManager = getAlarmManager();
+            mAlarmManager.cancel(mPendingIntent);
+            Log.i("LocationLogger","Alarm Removed");
+        }
+    }
+
+    private boolean isAlarmSet() {
+        Intent intent = getIntent();
+        return (PendingIntent.getBroadcast(getApplicationContext(), UNIQUE_ID_FOR_ALARM,
+                intent, PendingIntent.FLAG_NO_CREATE) != null);
     }
 
     public Handler getHandler() {
