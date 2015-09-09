@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.byteshaft.locationlogger.utils.DatabaseConstants;
+import com.byteshaft.locationlogger.utils.Helpers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,9 +31,11 @@ public class LocationDatabase extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
-    public void createNewEntry(String longitude, String latitude, String timestamp, String userId) {
+    public void createNewEntry(String ssid, String longitude, String latitude, String timestamp, String userId) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
+        values.put(DatabaseConstants.SSID_COLUMN,ssid);
+        values.put(DatabaseConstants.DEVICE_MAC, Helpers.getDeviceMac());
         values.put(DatabaseConstants.LONGITUDE_COLUMN, longitude);
         values.put(DatabaseConstants.LATITUDE_COLUMN, latitude);
         values.put(DatabaseConstants.TIME_STAMP_COLUMN, timestamp);
@@ -100,6 +103,16 @@ public class LocationDatabase extends SQLiteOpenHelper {
         cursor.close();
         return isEmpty;
     }
+
+     public boolean checkIfItemAlreadyExist(String item) {
+         SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + DatabaseConstants.TABLE_NAME
+                 + " WHERE "+DatabaseConstants.SSID_COLUMN+"  = '" + item + "'", null);
+         if (cursor.getCount() > 0) { // This will get the number of rows
+             return true;
+         }
+         return false;
+         }
 
     public void setOnDatabaseChangedListener(OnDatabaseChangedListener listener) {
         mListeners.add(listener);

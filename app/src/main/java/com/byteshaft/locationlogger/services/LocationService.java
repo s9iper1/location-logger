@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -15,12 +16,14 @@ import com.byteshaft.locationlogger.R;
 import com.byteshaft.locationlogger.database.LocationDatabase;
 import com.byteshaft.locationlogger.utils.Helpers;
 import com.byteshaft.locationlogger.utils.LocationHelpers;
+import com.byteshaft.locationlogger.wardrive.WarDriveHelpers;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class LocationService extends Service implements LocationListener,
@@ -35,6 +38,8 @@ public class LocationService extends Service implements LocationListener,
     private LocationHelpers mLocationHelpers;
     private LocationDatabase mLocationDatabase;
     private static LocationService sInstance;
+    private WarDriveHelpers wifiReceiver;
+    private ArrayList<String> mSsidList = new ArrayList<>();
 
     public static boolean isRunning() {
         return sInstance != null;
@@ -55,8 +60,16 @@ public class LocationService extends Service implements LocationListener,
                 if (mLocation != null) {
                     String latitudeLast = LocationHelpers.getLatitudeAsString(mLocation);
                     String longitudeLast = LocationHelpers.getLongitudeAsString(mLocation);
-                    mLocationDatabase.createNewEntry(longitudeLast, latitudeLast,
-                            LocationHelpers.getTimeStamp(), Helpers.getUserId());
+                    wifiReceiver.searchWifi();
+                    mSsidList = wifiReceiver.getSSIDArrayList();
+                    System.out.println("Running");
+                    for (String ssid: mSsidList) {
+                        if (!mLocationDatabase.checkIfItemAlreadyExist(ssid) || mLocationDatabase.isEmpty()) {
+                            mLocationDatabase.createNewEntry(ssid, longitudeLast, latitudeLast,
+                                    LocationHelpers.getTimeStamp(), Helpers.getUserId());
+                        }
+
+                    }
                     Log.w(LOG_TAG, "Failed to get location current location, saving last known location");
                     stopLocationUpdate();
                 } else {
@@ -71,8 +84,15 @@ public class LocationService extends Service implements LocationListener,
                 Log.i(LOG_TAG, "Location found, saving to database");
                 String latitude = LocationHelpers.getLatitudeAsString(mLocation);
                 String longitude = LocationHelpers.getLongitudeAsString(mLocation);
-                mLocationDatabase.createNewEntry(
-                        longitude, latitude, LocationHelpers.getTimeStamp(), Helpers.getUserId());
+                mSsidList = wifiReceiver.getSSIDArrayList();
+                for (String ssid: mSsidList) {
+                    System.out.println(ssid);
+                    mLocationDatabase.checkIfItemAlreadyExist(ssid);
+                    if (!mLocationDatabase.checkIfItemAlreadyExist(ssid) || mLocationDatabase.isEmpty()) {
+                        mLocationDatabase.createNewEntry(ssid, longitude, latitude,
+                                LocationHelpers.getTimeStamp(), Helpers.getUserId());
+                    }
+                }
                 stopLocationUpdate();
             }
         }
@@ -101,6 +121,8 @@ public class LocationService extends Service implements LocationListener,
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        wifiReceiver = new WarDriveHelpers();
+        registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         sInstance = this;
         mLocationHelpers = new LocationHelpers(getApplicationContext());
         mLocationDatabase = new LocationDatabase(getApplicationContext());
@@ -116,6 +138,7 @@ public class LocationService extends Service implements LocationListener,
         mLocationHelpers.getHandler().removeCallbacks(mLocationRunnable);
         reset();
         unregisterReceiver(mLocationRequestAlarmReceiver);
+        unregisterReceiver(wifiReceiver);
         sInstance = null;
         mLocationHelpers.cancelAlarmIfSet();
     }
@@ -176,9 +199,9 @@ public class LocationService extends Service implements LocationListener,
 
     @Override
     public void onNewEntryCreated() {
-        if (!LocationUploadService.isRunning()) {
-            Intent intent = new Intent(getApplicationContext(), LocationUploadService.class);
-            startService(intent);
-        }
+//        if (!LocationUploadService.isRunning()) {
+//            Intent intent = new Intent(getApplicationContext(), LocationUploadService.class);
+//            startService(intent);
+//        }
     }
 }
