@@ -5,6 +5,7 @@ public class DatabaseConstants {
     public static final String DATABASE_NAME = "LocationDatabase.db";
     public static final int DATABASE_VERSION = 1;
     public static final String TABLE_NAME = "LocationDatabase";
+    public static final String SSID_COLUMN = "SSID";
     public static final String LONGITUDE_COLUMN = "LONGITUDE";
     public static final String LATITUDE_COLUMN = "LATITUDE";
     public static final String TIME_STAMP_COLUMN = "TIME";
@@ -18,6 +19,7 @@ public class DatabaseConstants {
             + TABLE_NAME
             + OPENING_BRACE
             + ID_COLUMN + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + SSID_COLUMN+ " TEXT UNIQUE,"
             + LONGITUDE_COLUMN + " TEXT,"
             + LATITUDE_COLUMN + " TEXT,"
             + TIME_STAMP_COLUMN + " TEXT,"
