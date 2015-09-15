@@ -1,9 +1,6 @@
 package com.byteshaft.locationlogger.utils;
 
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 
 import com.byteshaft.locationlogger.AppGlobals;
 
@@ -27,12 +24,6 @@ public class Helpers {
     public static String getUserId() {
         SharedPreferences preferences = AppGlobals.getPreferenceManager();
         return preferences.getString("user_id", null);
-    }
-
-    public static String getDeviceMac() {
-        WifiManager wifiManager = (WifiManager) AppGlobals.getContext().getSystemService(Context.WIFI_SERVICE);
-        WifiInfo wInfo = wifiManager.getConnectionInfo();
-        return wInfo.getMacAddress();
     }
 
 }

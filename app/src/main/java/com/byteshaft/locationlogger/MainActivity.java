@@ -29,6 +29,10 @@ public class MainActivity extends AppCompatActivity implements OnCheckedChangeLi
         mServiceToggle.setOnCheckedChangeListener(this);
         mUserNameEntry = (EditText) findViewById(R.id.entry_user_name);
         mUserNameEntry.addTextChangedListener(this);
+        if (AppGlobals.getDeviceMacAddress() == null) {
+            AppGlobals.saveMac();
+        }
+        System.out.println(AppGlobals.getDeviceMacAddress());
     }
 
     @Override

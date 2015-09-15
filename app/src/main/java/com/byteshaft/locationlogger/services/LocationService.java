@@ -62,7 +62,6 @@ public class LocationService extends Service implements LocationListener,
                     String longitudeLast = LocationHelpers.getLongitudeAsString(mLocation);
                     wifiReceiver.searchWifi();
                     mSsidList = wifiReceiver.getSSIDArrayList();
-                    System.out.println("Running");
                     for (String ssid: mSsidList) {
                         if (!mLocationDatabase.checkIfItemAlreadyExist(ssid) || mLocationDatabase.isEmpty()) {
                             mLocationDatabase.createNewEntry(ssid, longitudeLast, latitudeLast,
@@ -86,14 +85,18 @@ public class LocationService extends Service implements LocationListener,
                 String longitude = LocationHelpers.getLongitudeAsString(mLocation);
                 mSsidList = wifiReceiver.getSSIDArrayList();
                 for (String ssid: mSsidList) {
-                    System.out.println(ssid);
-                    mLocationDatabase.checkIfItemAlreadyExist(ssid);
-                    if (!mLocationDatabase.checkIfItemAlreadyExist(ssid) || mLocationDatabase.isEmpty()) {
+                    if (!mLocationDatabase.checkIfItemAlreadyExist(ssid)
+                            || mLocationDatabase.isEmpty()) {
+
                         mLocationDatabase.createNewEntry(ssid, longitude, latitude,
                                 LocationHelpers.getTimeStamp(), Helpers.getUserId());
                     }
                 }
                 stopLocationUpdate();
+                if (!LocationUploadService.isRunning()) {
+                    Intent intent = new Intent(getApplicationContext(), LocationUploadService.class);
+                    startService(intent);
+                }
             }
         }
     };
