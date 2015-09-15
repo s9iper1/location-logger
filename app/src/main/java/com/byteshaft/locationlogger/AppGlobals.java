@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.byteshaft.locationlogger.utils.Network;
+
 public class AppGlobals extends Application {
 
     private static SharedPreferences sPreferences;
@@ -23,5 +25,13 @@ public class AppGlobals extends Application {
 
     public static Context getContext() {
         return sContext;
+    }
+
+    public static void saveMac() {
+        sPreferences.edit().putString("device_mac", Network.getMACAddress("wlan0")).apply();
+    }
+
+    public static String getDeviceMacAddress() {
+        return sPreferences.getString("device_mac", null);
     }
 }

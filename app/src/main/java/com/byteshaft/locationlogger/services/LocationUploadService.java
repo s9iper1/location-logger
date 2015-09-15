@@ -1,7 +1,6 @@
 package com.byteshaft.locationlogger.services;
 
 import android.app.IntentService;
-import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -14,7 +13,6 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,7 +45,6 @@ public class LocationUploadService extends IntentService {
                 String loginPassword = getString(R.string.server_login_password);
                 String sessionId = WebServiceHelpers.getSessionId(loginEmail, loginPassword);
                 WebServiceHelpers.writeRecords(sessionId, records);
-                database.clearTable();
                 database.close();
             } catch (IOException | JSONException e) {
                 database.close();

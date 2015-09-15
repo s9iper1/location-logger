@@ -15,12 +15,12 @@ import java.util.HashMap;
 
 public class WebServiceHelpers {
 
-    private static final String APP_NAME = "LocationLogger";
+    private static final String APP_NAME = "GeoBots";
     private static final String SESSION_URL = (
             "http://mirastatgps1.cloudapp.net:80/rest/user/session"
     );
     private static final String DATABASE_URL = (
-            "http://mirastatgps1.cloudapp.net:80/rest/TestThree/TableThree"
+            "http://mirastatgps1.cloudapp.net:80/rest/GeoBots/GeoBotFixes"
     );
 
     public static String getSessionId(String email, String password)
@@ -53,7 +53,11 @@ public class WebServiceHelpers {
             String latitude = (String) map.get("latitude");
             String timeStamp = (String) map.get("time_stamp");
             String userId = (String) map.get("user_id");
-            String jsonObjectString = getJsonObjectString(latitude, longitude, timeStamp, userId);
+            String ssid = (String) map.get("ssid");
+            String macAddress = Network.getMACAddress("wlan0");
+            String jsonObjectString = getJsonObjectString(
+                    latitude, longitude, timeStamp, userId, ssid, macAddress);
+            System.out.println("Get: " + macAddress);
             builder.append(jsonObjectString);
             builder.append(", ");
         }
@@ -63,26 +67,27 @@ public class WebServiceHelpers {
     }
 
     private static String getJsonObjectString(String latitude, String longitude, String timeStamp,
-                                              String userId) {
+                                              String userId, String ssid, String macAddress) {
 
         return String.format(
-                "{\"lat\": %s, \"lon\": %s, \"PulseDateTime\": \"%s\", \"userident\": \"%s\"}",
-                latitude, longitude, timeStamp, userId
+                "{\"lat\": %s, \"lon\": %s, \"PulseDataTime\": \"%s\", \"UserID\": \"%s\"," +
+                        "\"BotIDSignature\": \"%s\", \"DeviceMacID\": \"%s\"}",
+                latitude, longitude, timeStamp, userId, ssid, macAddress
         );
     }
 
-    public static void writeRecord(String session_id, String latitude, String longitude,
-                                   String timeStamp, String userId)
-            throws IOException, JSONException {
-
-        String data = getJsonObjectString(latitude, longitude, timeStamp, userId);
-        HttpURLConnection connection = openConnectionForUrl(DATABASE_URL);
-        connection.setRequestProperty("X-DreamFactory-Session-Token", session_id);
-        connection.connect();
-        sendRequestData(connection, data);
-        JSONObject jsonObj = readResponse(connection);
-        System.out.println(jsonObj.get("ID"));
-    }
+//    public static void writeRecord(String session_id, String latitude, String longitude,
+//                                   String timeStamp, String userId, String ssid, String macAddress)
+//            throws IOException, JSONException {
+//
+//        String data = getJsonObjectString(latitude, longitude, timeStamp, userId, ssid, macAddress);
+//        HttpURLConnection connection = openConnectionForUrl(DATABASE_URL);
+//        connection.setRequestProperty("X-DreamFactory-Session-Token", session_id);
+//        connection.connect();
+//        sendRequestData(connection, data);
+//        JSONObject jsonObj = readResponse(connection);
+//        System.out.println(jsonObj.get("ID"));
+//    }
 
     private static HttpURLConnection openConnectionForUrl(String path)
             throws IOException {

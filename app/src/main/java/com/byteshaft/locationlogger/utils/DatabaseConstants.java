@@ -20,7 +20,7 @@ public class DatabaseConstants {
             + OPENING_BRACE
             + ID_COLUMN + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + SSID_COLUMN+ " TEXT UNIQUE,"
-            + DEVICE_MAC + " TEXT , "
+            + DEVICE_MAC + " VARCHAR , "
             + LONGITUDE_COLUMN + " TEXT,"
             + LATITUDE_COLUMN + " TEXT,"
             + TIME_STAMP_COLUMN + " TEXT,"
