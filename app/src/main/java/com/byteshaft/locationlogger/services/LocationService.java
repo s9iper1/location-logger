@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.byteshaft.locationlogger.AppGlobals;
 import com.byteshaft.locationlogger.R;
 import com.byteshaft.locationlogger.database.LocationDatabase;
 import com.byteshaft.locationlogger.utils.Helpers;
@@ -80,22 +82,26 @@ public class LocationService extends Service implements LocationListener,
                 mLocationRecursionCounter++;
                 Log.i(LOG_TAG, "Tracker Thread Running: " + mLocationRecursionCounter);
             } else {
-                Log.i(LOG_TAG, "Location found, saving to database");
                 String latitude = LocationHelpers.getLatitudeAsString(mLocation);
                 String longitude = LocationHelpers.getLongitudeAsString(mLocation);
                 mSsidList = wifiReceiver.getSSIDArrayList();
-                for (String ssid: mSsidList) {
-                    if (!mLocationDatabase.checkIfItemAlreadyExist(ssid)
-                            || mLocationDatabase.isEmpty()) {
-
-                        mLocationDatabase.createNewEntry(ssid, longitude, latitude,
-                                LocationHelpers.getTimeStamp(), Helpers.getUserId());
+                if (mSsidList != null) {
+                    for (String ssid: mSsidList) {
+                        SharedPreferences sharedPreferences = AppGlobals.getPreferenceManager();
+                        if (!sharedPreferences.contains(ssid.replace(".", ""))
+                                || mLocationDatabase.isEmpty()) {
+                            Log.i(LOG_TAG, "Location found, saving to database");
+                            mLocationDatabase.createNewEntry(ssid, longitude, latitude,
+                                    LocationHelpers.getTimeStamp(), Helpers.getUserId());
+                            AppGlobals.saveSsidToDatabase(ssid.replace(".", ""), false);
+                        }
                     }
-                }
-                stopLocationUpdate();
+                    stopLocationUpdate();
                 if (!LocationUploadService.isRunning()) {
                     Intent intent = new Intent(getApplicationContext(), LocationUploadService.class);
                     startService(intent);
+                }
+
                 }
             }
         }
