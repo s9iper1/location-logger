@@ -34,12 +34,4 @@ public class AppGlobals extends Application {
     public static String getDeviceMacAddress() {
         return sPreferences.getString("device_mac", null);
     }
-
-    public static void saveSsidToDatabase(String key, boolean value) {
-        sPreferences.edit().putBoolean(key, value).commit();
-    }
-
-    public static boolean getSsidStatus(String key) {
-        return sPreferences.getBoolean(key, false);
-    }
 }

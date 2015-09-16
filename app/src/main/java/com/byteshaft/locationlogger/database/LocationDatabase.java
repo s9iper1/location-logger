@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.byteshaft.locationlogger.AppGlobals;
 import com.byteshaft.locationlogger.utils.DatabaseConstants;
 
 import java.util.ArrayList;
@@ -63,8 +62,6 @@ public class LocationDatabase extends SQLiteOpenHelper {
                     cursor.getColumnIndex(DatabaseConstants.SSID_COLUMN));
             String userID = cursor.getString(
                     cursor.getColumnIndex(DatabaseConstants.USER_ID_COLUMN));
-            System.out.println(ssid + "is  & value is " + AppGlobals.getSsidStatus(ssid));
-            if (!AppGlobals.getSsidStatus(ssid)) {
                 HashMap<String, String> hashMap = new HashMap<>();
                 hashMap.put("unique_id", String.valueOf(unique_id));
                 hashMap.put("longitude", longitude);
@@ -73,8 +70,6 @@ public class LocationDatabase extends SQLiteOpenHelper {
                 hashMap.put("user_id", userID);
                 hashMap.put("ssid", ssid);
                 list.add(hashMap);
-                AppGlobals.saveSsidToDatabase(ssid, true);
-            }
         }
         db.close();
         cursor.close();
