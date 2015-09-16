@@ -96,6 +96,7 @@ public class LocationService extends Service implements LocationListener,
                 }
 
                 }
+                stopLocationUpdate();
             }
         }
     };
