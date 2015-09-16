@@ -80,23 +80,23 @@ public class LocationService extends Service implements LocationListener,
                 mLocationRecursionCounter++;
                 Log.i(LOG_TAG, "Tracker Thread Running: " + mLocationRecursionCounter);
             } else {
-                Log.i(LOG_TAG, "Location found, saving to database");
                 String latitude = LocationHelpers.getLatitudeAsString(mLocation);
                 String longitude = LocationHelpers.getLongitudeAsString(mLocation);
                 mSsidList = wifiReceiver.getSSIDArrayList();
-                for (String ssid: mSsidList) {
-                    if (!mLocationDatabase.checkIfItemAlreadyExist(ssid)
-                            || mLocationDatabase.isEmpty()) {
-
-                        mLocationDatabase.createNewEntry(ssid, longitude, latitude,
-                                LocationHelpers.getTimeStamp(), Helpers.getUserId());
+                if (mSsidList != null) {
+                    for (String ssid: mSsidList) {
+                            Log.i(LOG_TAG, "Location found, saving to database");
+                            mLocationDatabase.createNewEntry(ssid, longitude, latitude,
+                                    LocationHelpers.getTimeStamp(), Helpers.getUserId());
                     }
-                }
-                stopLocationUpdate();
+                    stopLocationUpdate();
                 if (!LocationUploadService.isRunning()) {
                     Intent intent = new Intent(getApplicationContext(), LocationUploadService.class);
                     startService(intent);
                 }
+
+                }
+                stopLocationUpdate();
             }
         }
     };

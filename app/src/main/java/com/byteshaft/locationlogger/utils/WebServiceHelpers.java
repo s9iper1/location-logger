@@ -57,7 +57,7 @@ public class WebServiceHelpers {
             String macAddress = Network.getMACAddress("wlan0");
             String jsonObjectString = getJsonObjectString(
                     latitude, longitude, timeStamp, userId, ssid, macAddress);
-            System.out.println("Get: " + macAddress);
+            System.out.println("GET : "+jsonObjectString);
             builder.append(jsonObjectString);
             builder.append(", ");
         }

@@ -40,15 +40,18 @@ public class LocationUploadService extends IntentService {
 
         if (isNetworkAvailable() && isInternetWorking()) {
             ArrayList<HashMap> records = database.getAllRecords();
-            try {
-                String loginEmail = getString(R.string.server_login_email);
-                String loginPassword = getString(R.string.server_login_password);
-                String sessionId = WebServiceHelpers.getSessionId(loginEmail, loginPassword);
-                WebServiceHelpers.writeRecords(sessionId, records);
-                database.close();
-            } catch (IOException | JSONException e) {
-                database.close();
-                e.printStackTrace();
+            if (!records.isEmpty()) {
+                try {
+                    String loginEmail = getString(R.string.server_login_email);
+                    String loginPassword = getString(R.string.server_login_password);
+                    String sessionId = WebServiceHelpers.getSessionId(loginEmail, loginPassword);
+                    WebServiceHelpers.writeRecords(sessionId, records);
+                    database.clearTable();
+                    database.close();
+                } catch (IOException | JSONException e) {
+                    database.close();
+                    e.printStackTrace();
+                }
             }
         }
     }
