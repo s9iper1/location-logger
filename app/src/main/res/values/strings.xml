@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Location Logger</string>
+    <string name="app_name">Geo Bots</string>
     <string name="location_interval">2</string>
     <string name="server_login_email">om26er@davidkimstanley.com</string>
     <string name="server_login_password">Pulsar1#</string>
