@@ -55,8 +55,9 @@ public class WebServiceHelpers {
             String userId = (String) map.get("user_id");
             String ssid = (String) map.get("ssid");
             String macAddress = Network.getMACAddress("wlan0");
+            String strength = (String) map.get("strength");
             String jsonObjectString = getJsonObjectString(
-                    latitude, longitude, timeStamp, userId, ssid, macAddress);
+                    latitude, longitude, timeStamp, userId, ssid, macAddress, strength);
             System.out.println("GET : "+jsonObjectString);
             builder.append(jsonObjectString);
             builder.append(", ");
@@ -67,12 +68,13 @@ public class WebServiceHelpers {
     }
 
     private static String getJsonObjectString(String latitude, String longitude, String timeStamp,
-                                              String userId, String ssid, String macAddress) {
+                                              String userId, String ssid, String macAddress,
+                                              String strength) {
 
         return String.format(
                 "{\"lat\": %s, \"lon\": %s, \"PulseDataTime\": \"%s\", \"UserID\": \"%s\"," +
-                        "\"BotIDSignature\": \"%s\", \"DeviceMacID\": \"%s\"}",
-                latitude, longitude, timeStamp, userId, ssid, macAddress
+                        "\"BotIDSignature\": \"%s\", \"DeviceMacID\": \"%s\", \"strength\": \"%s\"}",
+                latitude, longitude, timeStamp, userId, ssid, macAddress, strength
         );
     }
 

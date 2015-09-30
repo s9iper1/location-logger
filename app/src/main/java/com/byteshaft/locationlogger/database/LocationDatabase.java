@@ -30,11 +30,12 @@ public class LocationDatabase extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
-    public void createNewEntry(String ssid, String longitude, String latitude, String timestamp,
+    public void createNewEntry(String ssid, String strength, String longitude, String latitude, String timestamp,
                                String userId) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(DatabaseConstants.SSID_COLUMN,ssid);
+        values.put(DatabaseConstants.SIGNAL_STRENGTH,strength);
         values.put(DatabaseConstants.LONGITUDE_COLUMN, longitude);
         values.put(DatabaseConstants.LATITUDE_COLUMN, latitude);
         values.put(DatabaseConstants.TIME_STAMP_COLUMN, timestamp);
@@ -60,6 +61,8 @@ public class LocationDatabase extends SQLiteOpenHelper {
                     cursor.getColumnIndex(DatabaseConstants.TIME_STAMP_COLUMN));
             String ssid = cursor.getString(
                     cursor.getColumnIndex(DatabaseConstants.SSID_COLUMN));
+            String strength = cursor.getString(
+                    cursor.getColumnIndex(DatabaseConstants.SIGNAL_STRENGTH));
             String userID = cursor.getString(
                     cursor.getColumnIndex(DatabaseConstants.USER_ID_COLUMN));
             HashMap<String, String> hashMap = new HashMap<>();
@@ -69,6 +72,7 @@ public class LocationDatabase extends SQLiteOpenHelper {
             hashMap.put("time_stamp", time);
             hashMap.put("user_id", userID);
             hashMap.put("ssid", ssid);
+            hashMap.put("strength", strength);
             list.add(hashMap);
         }
         db.close();

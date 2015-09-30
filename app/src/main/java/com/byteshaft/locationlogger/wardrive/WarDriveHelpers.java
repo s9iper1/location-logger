@@ -8,9 +8,9 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 
 import com.byteshaft.locationlogger.AppGlobals;
-import com.byteshaft.locationlogger.database.LocationDatabase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class WarDriveHelpers extends BroadcastReceiver {
@@ -18,8 +18,7 @@ public class WarDriveHelpers extends BroadcastReceiver {
     private WifiManager wifiManager;
     private List<ScanResult> scanResults;
     private ArrayList<String> mArrayList;
-    private ArrayList<String> mUniqueArrayList;
-    private LocationDatabase mLocationDatabase;
+    private ArrayList<HashMap> hashMapArrayList;
 
 
     @SuppressWarnings("static-access")
@@ -36,16 +35,25 @@ public class WarDriveHelpers extends BroadcastReceiver {
         return mArrayList;
     }
 
+    public ArrayList<HashMap> getHashMapArrayList() {
+        return hashMapArrayList;
+    }
+
     @SuppressWarnings("static-access")
     @Override
     public void onReceive(Context context, Intent intent) {
         mArrayList = new ArrayList<>();
-        mLocationDatabase = new LocationDatabase(context);
+        hashMapArrayList = new ArrayList<>();
         wifiManager = (WifiManager) AppGlobals.getContext().getSystemService(
                 AppGlobals.getContext().WIFI_SERVICE);
         scanResults = wifiManager.getScanResults();
         for(ScanResult result : scanResults) {
-            mArrayList.add(result.SSID);
+            String ssid = result.SSID;
+            int strength = result.level;
+            mArrayList.add(ssid);
+            HashMap<String, String> hashMap = new HashMap<>();
+            hashMap.put(ssid, String.valueOf(strength));
+            hashMapArrayList.add(hashMap);
         }
     }
 }

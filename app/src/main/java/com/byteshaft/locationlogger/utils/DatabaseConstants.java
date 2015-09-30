@@ -6,7 +6,7 @@ public class DatabaseConstants {
     public static final int DATABASE_VERSION = 1;
     public static final String TABLE_NAME = "LocationDatabase";
     public static final String SSID_COLUMN = "SSID";
-    public static final String DEVICE_MAC = "device_mac";
+    public static final String SIGNAL_STRENGTH = "strength";
     public static final String LONGITUDE_COLUMN = "LONGITUDE";
     public static final String LATITUDE_COLUMN = "LATITUDE";
     public static final String TIME_STAMP_COLUMN = "TIME";
@@ -20,7 +20,7 @@ public class DatabaseConstants {
             + OPENING_BRACE
             + ID_COLUMN + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + SSID_COLUMN+ " TEXT UNIQUE,"
-            + DEVICE_MAC + " VARCHAR , "
+            + SIGNAL_STRENGTH + " TEXT, "
             + LONGITUDE_COLUMN + " TEXT,"
             + LATITUDE_COLUMN + " TEXT,"
             + TIME_STAMP_COLUMN + " TEXT,"

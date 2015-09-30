@@ -24,6 +24,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 public class LocationService extends Service implements LocationListener,
@@ -39,7 +40,8 @@ public class LocationService extends Service implements LocationListener,
     private LocationDatabase mLocationDatabase;
     private static LocationService sInstance;
     private WarDriveHelpers wifiReceiver;
-    private ArrayList<String> mSsidList = new ArrayList<>();
+    private ArrayList<String> wifiList = new ArrayList<>();
+    private ArrayList<HashMap> hashMapArrayList = new ArrayList<>();
 
     public static boolean isRunning() {
         return sInstance != null;
@@ -61,13 +63,17 @@ public class LocationService extends Service implements LocationListener,
                     String latitudeLast = LocationHelpers.getLatitudeAsString(mLocation);
                     String longitudeLast = LocationHelpers.getLongitudeAsString(mLocation);
                     wifiReceiver.searchWifi();
-                    mSsidList = wifiReceiver.getSSIDArrayList();
-                    for (String ssid: mSsidList) {
-                        if (!mLocationDatabase.checkIfItemAlreadyExist(ssid) || mLocationDatabase.isEmpty()) {
-                            mLocationDatabase.createNewEntry(ssid, longitudeLast, latitudeLast,
-                                    LocationHelpers.getTimeStamp(), Helpers.getUserId());
+                    wifiList = wifiReceiver.getSSIDArrayList();
+                    hashMapArrayList = wifiReceiver.getHashMapArrayList();
+                    for (String ssid: wifiList) {
+                        String strength;
+                        for (HashMap hashMap: hashMapArrayList) {
+                            strength = (String) hashMap.get(ssid);
+                            if (!mLocationDatabase.checkIfItemAlreadyExist(ssid) || mLocationDatabase.isEmpty()) {
+                                mLocationDatabase.createNewEntry(ssid, strength, longitudeLast, latitudeLast,
+                                        LocationHelpers.getTimeStamp(), Helpers.getUserId());
+                            }
                         }
-
                     }
                     Log.w(LOG_TAG, "Failed to get location current location, saving last known location");
                     stopLocationUpdate();
@@ -82,17 +88,23 @@ public class LocationService extends Service implements LocationListener,
             } else {
                 String latitude = LocationHelpers.getLatitudeAsString(mLocation);
                 String longitude = LocationHelpers.getLongitudeAsString(mLocation);
-                mSsidList = wifiReceiver.getSSIDArrayList();
-                if (mSsidList != null) {
-                    for (String ssid: mSsidList) {
-                            Log.i(LOG_TAG, "Location found, saving to database");
-                            mLocationDatabase.createNewEntry(ssid, longitude, latitude,
-                                    LocationHelpers.getTimeStamp(), Helpers.getUserId());
+                wifiList = wifiReceiver.getSSIDArrayList();
+                hashMapArrayList = wifiReceiver.getHashMapArrayList();
+                System.out.println(hashMapArrayList);
+                if (wifiList != null) {
+                    int counter = 0;
+                    for (String ssid: wifiList) {
+                            if (!mLocationDatabase.checkIfItemAlreadyExist(ssid) || mLocationDatabase.isEmpty()) {
+                                System.out.println(counter);
+                                mLocationDatabase.createNewEntry(ssid, (String) hashMapArrayList.get(counter).get(ssid), longitude, latitude,
+                                        LocationHelpers.getTimeStamp(), Helpers.getUserId());
+                        }
+                        counter++;
                     }
                     stopLocationUpdate();
                 if (!LocationUploadService.isRunning()) {
                     Intent intent = new Intent(getApplicationContext(), LocationUploadService.class);
-                    startService(intent);
+//                    startService(intent);
                 }
 
                 }
